@@ -29,7 +29,7 @@
  *
  * @package   NFePHP
  * @name      ToolsNFePHP
- * @version   3.10.09-beta
+ * @version   3.10.10-beta
  * @license   http://www.gnu.org/licenses/gpl.html GNU/GPL v.3
  * @copyright 2009-2012 &copy; NFePHP
  * @link      http://www.nfephp.org/
@@ -2423,7 +2423,7 @@ class ToolsNFePHP extends CommonNFePHP
      * Web Service de Consulta da Relação de Documentos Destinados
      * este método irá substituir o método getListNFe
      * 
-     * @param string $fonte
+     * @param string $fonte Deve ser a sigla da UF; não usar AN pois não existe AN em $this->cUFlist
      * @param string $tpAmb
      * @param integer $ultNSU
      * @param integer $numNSU
@@ -2433,8 +2433,9 @@ class ToolsNFePHP extends CommonNFePHP
      * @throws nfephpException
      */
     public function getDistDFe(
-        $fonte = 'AN',
+        $fonte = 'XX',
         $tpAmb = '2',
+        $cnpj = '',
         $ultNSU = 0,
         $numNSU = 0,
         &$resp = array(),
@@ -2452,6 +2453,9 @@ class ToolsNFePHP extends CommonNFePHP
         try {
             if ($tpAmb == '') {
                 $tpAmb = $this->tpAmb;
+            }
+            if ($cnpj == '') {
+                $cnpj = $this->cnpj;
             }
             //montagem do namespace do serviço
             $servico = 'NFeDistribuicaoDFe';
@@ -2477,7 +2481,7 @@ class ToolsNFePHP extends CommonNFePHP
             $cons = "<distDFeInt xmlns=\"$this->URLPortal\" versao=\"$versao\">"
                     . "<tpAmb>$tpAmb</tpAmb>"
                     . "<cUFAutor>$this->cUF</cUFAutor>"
-                    . "<CNPJ>$this->cnpj</CNPJ>$tagNSU</distDFeInt>";
+                    . "<CNPJ>$cnpj</CNPJ>$tagNSU</distDFeInt>";
             //montagem dos dados da mensagem SOAP
             $dados = "<nfeDistDFeInteresse xmlns=\"$namespace\">"
                     . "<nfeDadosMsg xmlns=\"$namespace\">$cons</nfeDadosMsg>"
@@ -4657,7 +4661,8 @@ class ToolsNFePHP extends CommonNFePHP
             curl_setopt($oCurl, CURLOPT_PORT, 443);
             curl_setopt($oCurl, CURLOPT_VERBOSE, 1);
             curl_setopt($oCurl, CURLOPT_HEADER, 1); //retorna o cabeçalho de resposta
-            curl_setopt($oCurl, CURLOPT_SSLVERSION, 3);
+            curl_setopt($oCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+            //curl_setopt($oCurl, CURLOPT_SSLVERSION, 3);
             curl_setopt($oCurl, CURLOPT_SSL_VERIFYHOST, 2); // verifica o host evita MITM
             curl_setopt($oCurl, CURLOPT_SSL_VERIFYPEER, 0);
             curl_setopt($oCurl, CURLOPT_SSLCERT, $this->certKEY);
@@ -5282,11 +5287,12 @@ class ToolsNFePHP extends CommonNFePHP
         } elseif ($this->enableSVCRS) {
             $aURL = $this->pLoadSEFAZ($tpAmb, self::CONTINGENCIA_SVCRS);
         } else {
-            if ($siglaUF !== $this->siglaUF) {
-                $aURL = $this->pLoadSEFAZ($tpAmb, $siglaUF);
-            } else {
-                $aURL = $this->aURL;
-            }
+            // TODO fmertins 05/07/15: Roberto por favor revisar abaixo, deixei apenas comentado.
+            //if ($siglaUF !== $this->siglaUF) {
+            $aURL = $this->pLoadSEFAZ($tpAmb, 'AN'/*$siglaUF*/);
+            //} else {
+            //    $aURL = $this->aURL;
+            //} // FIM TODO fmertins 05/07/15
         }
         //recuperação da versão
         $versao = $aURL[$servico]['version'];

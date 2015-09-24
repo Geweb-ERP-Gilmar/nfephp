@@ -663,8 +663,14 @@ class MakeNFe
                 $identificador . "Indicador da IE do Destinatário"
             );
         }
-        if ($indIEDest != '9' && $indIEDest != '2') {
-            $this->zAddChild($this->dest, "IE", $numIE, true, $identificador . "Inscrição Estadual do Destinatário");
+        if ($numIE != '' && $numIE != 'ISENTO') {
+            $this->zAddChild(
+                $this->dest,
+                "IE",
+                $numIE,
+                true,
+                $identificador . "Inscrição Estadual do Destinatário"
+            );
         }
         $this->zAddChild($this->dest, "ISUF", $isUF, false, $identificador . "Inscrição na SUFRAMA do destinatário");
         $this->zAddChild(
@@ -3294,6 +3300,9 @@ class MakeNFe
             if (!empty($this->aII[$nItem])) {
                 $this->zAppChild($imposto, $this->aII[$nItem], "Inclusão do node II");
             }
+            if (!empty($this->aISSQN[$nItem])) {
+                $this->zAppChild($imposto, $this->aISSQN[$nItem], "Inclusão do node ISSQN");
+            }
             if (!empty($this->aPIS[$nItem])) {
                 $this->zAppChild($imposto, $this->aPIS[$nItem], "Inclusão do node PIS");
             }
@@ -3305,9 +3314,6 @@ class MakeNFe
             }
             if (!empty($this->aCOFINSST[$nItem])) {
                 $this->zAppChild($imposto, $this->aCOFINSST[$nItem], "Inclusão do node COFINSST");
-            }
-            if (!empty($this->aISSQN[$nItem])) {
-                $this->zAppChild($imposto, $this->aISSQN[$nItem], "Inclusão do node ISSQN");
             }
             $this->aImposto[$nItem] = $imposto;
         }

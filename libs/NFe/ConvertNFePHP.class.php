@@ -27,7 +27,7 @@
  *
  * @package     NFePHP
  * @name        ConvertNFePHP
- * @version     3.10.19
+ * @version     3.10.20
  * @license     http://www.gnu.org/licenses/gpl.html GNU/GPL v.3
  * @license     http://www.gnu.org/licenses/lgpl.html GNU/LGPL v.3
  * @copyright   2009-2015 &copy; NFePHP
@@ -209,7 +209,7 @@ class ConvertNFePHP
                           $indTot, $xPed, $nItemPed, $DI, $dDI, $xLocDesemb,
                           $UFDesemb, $dDesemb, $tpViaTransp, $vAFRMM, $tpIntermedio,
                           $UFTerceiro, $cExportador, $adi, $nAdicao,
-                          $nSeqAdicC, $cFabricante, $vDescDI, $nDraw,
+                          $nSeqAdic, $cFabricante, $vDescDI, $nDraw,
                           $detExport, $exportInd, $nRE, $chNFe, $qExport, $veicProd, $tpOP,
                           $chassi, $cCor, $xCor, $pot, $cilin, $pesoL, $pesoB,
                           $nSerie, $tpComb, $nMotor, $CMT, $dist, $anoMod,
@@ -538,7 +538,7 @@ class ConvertNFePHP
                         $dest->appendChild($xNome);
                         $indIEDest = $dom->createElement("indIEDest", $dados[2]);
                         $dest->appendChild($indIEDest);
-                        if ($dados[2] != '2' && $dados[2] != '9') {
+                        if ($dados[3] != '' && $dados[3] != 'ISENTO' && $dados[2] != '9') {
                             $IE = $dom->createElement("IE", $dados[3]);
                             $dest->appendChild($IE);
                         }
@@ -840,6 +840,7 @@ class ConvertNFePHP
                     //I05a|NVE|
                     $NVE = $dom->createElement("NVE", $dados[1]);
                     $prod->appendChild($NVE);
+                    break;
                 case "I18":
                     //Tag da Declaração de Importação [prod]
                     //I18|nDI|dDI|xLocDesemb|UFDesemb|dDesemb|tpViaTransp|vAFRMM|tpIntermedio|CNPJ|UFTerceiro|cExportador|
@@ -900,15 +901,15 @@ class ConvertNFePHP
                     break;
                 case "I25":
                     //Adições [DI]
-                    //I25|nAdicao|nSeqAdicC|cFabricante|vDescDI|nDraw|
+                    //I25|nAdicao|nSeqAdic|cFabricante|vDescDI|nDraw|
                     $adi = $dom->createElement("adi");
                     if (!empty($dados[1])) {
                         $nAdicao = $dom->createElement("nAdicao", $dados[1]);
                         $adi->appendChild($nAdicao);
                     }
                     if (!empty($dados[2])) {
-                        $nSeqAdicC = $dom->createElement("nSeqAdicC", $dados[2]);
-                        $adi->appendChild($nSeqAdicC);
+                        $nSeqAdic = $dom->createElement("nSeqAdic", $dados[2]);
+                        $adi->appendChild($nSeqAdic);
                     }
                     if (!empty($dados[3])) {
                         $cFabricante = $dom->createElement("cFabricante", $dados[3]);
@@ -1784,18 +1785,18 @@ class ConvertNFePHP
                     break;
                 case "Q05":
                     //Grupo de PIS Outras Operações 0 ou 1 [PIS]
-                    //Q05|CST|vPIS|
+                    //Q05|CST|
                     $PISOutr = $dom->createElement("PISOutr");
                     $CST = $dom->createElement("CST", $dados[1]);
                     $PISOutr->appendChild($CST);
-                    $vPIS = $dom->createElement("vPIS", $dados[2]);
-                    $PISOutr->appendChild($vPIS);
-                    $PIS->appendChild($PISOutr);
                     break;
                 case "Q07":
                     //Valor da Base de Cálculo do PIS e Alíquota do PIS (em percentual) 0 pu 1 [PISOutr]
                     // todos esses campos sao obrigatorios
-                    //Q07|vBC|pPIS|
+                    //Q07|vBC|pPIS|vPIS|
+                    $vPIS = $dom->createElement("vPIS", $dados[3]);
+                    $PISOutr->appendChild($vPIS);
+                    $PIS->appendChild($PISOutr);
                     $vBC = $dom->createElement("vBC", $dados[1]);
                     $PISOutr->insertBefore($vBC, $vPIS);
                     $pPIS = $dom->createElement("pPIS", $dados[2]);
