@@ -77,5 +77,10 @@
             "dev-develop": "4.0.x-dev"
         }
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.10.x-dev"
+        }
+    }
 }

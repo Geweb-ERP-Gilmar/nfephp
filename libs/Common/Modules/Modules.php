@@ -1,22 +1,14 @@
 <?php
-namespace Common\Modules;
 
-/**
- * Classe auxiliar para obter informações dos modulos instalados no PHP
- * @category   NFePHP
- * @package    NFePHP\Common\Modules
- * @copyright  Copyright (c) 2008-2014
- * @license    http://www.gnu.org/licenses/lesser.html LGPL v3
- * @author     Roberto L. Machado <linux.rlm at gmail dot com>
- * @link       http://github.com/nfephp-org/nfephp for the canonical source repository
- */
+namespace Common\Modules;
 
 class Modules
 {
-    protected $list;
-    protected $cRed = '#FF0000';
-    protected $cGreen = '#00CC00';
+    public $list;
 
+    /**
+     * 
+     */
     public function __construct()
     {
         ob_start();
@@ -50,8 +42,9 @@ class Modules
     }
 
     /**
-     * Checagem rápida se o modulo está carregadp
+     * Checagem rápida de o modulo esta carregadp
      * true se carregado ou false se não
+     * 
      * @param string $moduleName
      * @return boolean
      */
@@ -64,9 +57,9 @@ class Modules
     }
 
     /**
-     * Obtêm os parâmetros do modulo carregado
-     * Pode ser uma simples configuração especificada por $setting 
-     * ou todos os valores caso nada seja passado no parâmetro
+     * Obtem os parametros do modulo carregado
+     * Pode ser uma simples configuração espacificada por $setting 
+     * ou todos os valotes case nada seja passado no parâmetro
      * @param string $moduleName
      * @param string $setting
      * @return string
@@ -77,26 +70,28 @@ class Modules
         if ($this->isLoaded($moduleName)==false) {
             return 'Modulo não carregado';
         }
-        if ($this->list[$moduleName][$setting]) {
-            return $this->list[$moduleName][$setting];
+        if ($this->Modules[$moduleName][$setting]) {
+            return $this->Modules[$moduleName][$setting];
         } elseif (empty($setting)) {
-            return $this->list[$moduleName];
+            return $this->Modules[$moduleName];
         }
         return 'Parâmetros não localizados';
     }
+
     
     /**
-     * Lista todos os modulos php instalados sem seus 
+     * Lista todos os modulos php intalados sem seus 
      * parametros
      * @return array
      */
     public function listModules()
     {
-        foreach (array_keys($this->list) as $moduleName) {
+        foreach (array_keys($this->Modules) as $moduleName) {
             $onlyModules[] = $moduleName;
         }
         return $onlyModules;
     }
+    
     
     /**
      * Função para padronização do numero de versões de 2.7.2 para 020702 
@@ -111,71 +106,5 @@ class Modules
         str_pad(isset($aVer[1]) ? $aVer[1] : '', 2, "0", STR_PAD_LEFT) .
         str_pad(isset($aVer[2]) ? $aVer[2] : '', 2, "0", STR_PAD_LEFT);
         return $nver;
-    }
-    
-    /**
-     * testPHP
-     * @param string $limit
-     * @return string
-     */
-    public function testPHP($limit = '5.4')
-    {
-        $phpversion = str_replace('-', '', substr(PHP_VERSION, 0, 6));
-        $phpver = $this->convVer($phpversion);
-        $phpcor = $this->cGreen;
-        $status = 'OK';
-        if ($phpver < $this->convVer($limit)) {
-            $phpcor = $this->cRed;
-            $status = 'NOK';
-        }
-        return "<tr bgcolor=\"#FFFF99\">"
-            . "<td>PHP vers&atilde;o $phpversion</td>"
-            . "<td bgcolor=\"$phpcor\"><div align=\"center\">$status</div></td>"
-            . "<td>A vers&atilde;o do PHP deve ser $limit ou maior</td></tr>";
-    }
-    
-    /**
-     * Rotina de teste dos molulos instalados 
-     * se a versão é suficiente e se estão habilitados
-     * @param string $name
-     * @param string $alias
-     * @param string $param1
-     * @param string $param2
-     * @param string $limit
-     * @param string $coment
-     * @return string
-     */
-    public function testModule(
-        $name,
-        $alias = '',
-        $param1 = '',
-        $param2 = '',
-        $limit = '',
-        $coment = ''
-    ) {
-        $cor = $this->cRed;
-        $msg = ' N&atilde;o instalado !!!';
-        $status = 'NOK';
-        if ($this->isLoaded($name)) {
-            $msg = '';
-            $num = '';
-            $enabled = 'enabled';
-            if (!empty($param1)) {
-                $version = $this->getModuleSetting($name, $param1);
-                $num = (int) $this->convVer($version);
-                $msg = ' vers&atilde;o ' . $version;
-            }
-            if (!empty($param2)) {
-                $enabled = $this->getModuleSetting($name, $param2);
-            }
-            if ($num >= (int) $this->convVer($limit) && $enabled == 'enabled') {
-                $cor = $this->cGreen;
-                $status = 'OK';
-            }
-        }
-        return "<tr bgcolor=\"#FFFF99\">"
-            . "<td>$alias $msg</td>"
-            . "<td bgcolor=\"$cor\"><div align=\"center\">$status</div></td>"
-            . "<td>$coment</td></tr>";
     }
 }

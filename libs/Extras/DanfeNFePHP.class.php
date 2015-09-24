@@ -1,15 +1,68 @@
 <?php
+/**
+ * Este arquivo é parte do projeto NFePHP - Nota Fiscal eletrônica em PHP.
+ *
+ * Este programa é um software livre: você pode redistribuir e/ou modificá-lo
+ * sob os termos da Licença Pública Geral GNU como é publicada pela Fundação
+ * para o Software Livre, na versão 3 da licença, ou qualquer versão posterior.
+ * e/ou
+ * sob os termos da Licença Pública Geral Menor GNU (LGPL) como é publicada pela
+ * Fundação para o Software Livre, na versão 3 da licença, ou qualquer versão posterior.
+ *
+ * Este programa é distribuído na esperança que será útil, mas SEM NENHUMA
+ * GARANTIA; nem mesmo a garantia explícita definida por qualquer VALOR COMERCIAL
+ * ou de ADEQUAÇÃO PARA UM PROPÓSITO EM PARTICULAR,
+ * veja a Licença Pública Geral GNU para mais detalhes.
+ *
+ * Você deve ter recebido uma cópia da Licença Publica GNU e da
+ * Licença Pública Geral Menor GNU (LGPL) junto com este programa.
+ * Caso contrário consulte
+ * <http://www.fsfla.org/svnwiki/trad/GPLv3>
+ * ou
+ * <http://www.fsfla.org/svnwiki/trad/LGPLv3>.
+ *
+ * @package     NFePHP
+ * @name        DanfeNFePHP.class.php
+ * @version     2.2.6
+ * @license     http://www.gnu.org/licenses/gpl.html GNU/GPL v.3
+ * @license     http://www.gnu.org/licenses/lgpl.html GNU/LGPL v.3
+ * @copyright   2009-2012 &copy; NFePHP
+ * @link        http://www.nfephp.org/
+ * @author      Roberto L. Machado <linux.rlm at gmail dot com>
+ * @author      Marcos Diez <marcos at unitron dot com dot br>
+ *
+ *        CONTRIBUIDORES (por ordem alfabetica):
+ *              Abdenego Santos <abdenego at gmail dot com>
+ *              André Ferreira de Morais <andrefmoraes at gmail dot com>
+ *              Bruno J R Lima <brunofileh at gmail dot com>
+ *              Chrystian Toigo <ctoigo at gmail dot com>
+ *              Djalma Fadel Junior <dfadel at ferasoft dot com dot br>
+ *              Eduardo Gusmão <eduardo dot intrasis at gmail dot com>
+ *              Faruk Mustafa Zahra < farukz at gmail dot com >
+ *              Felipe Bonato <montanhats at gmail dot com>
+ *              Fernando Mertins <fernando dot mertins at gmail dot com>
+ *              Guilherme Calabria Filho <guiga at gmail dot com>
+ *              Leandro C. Lopez <leandro.castoldi at gmail dot com>
+ *              Paulo Gabriel Coghi < paulocoghi at gmail dot com>
+ *              Rafael Stavarengo <faelsta at gmail dot com>
+ *              Renato Zaccaron Gonzaga <renato at zaccaron dot com dot br>
+ *              Roberto Spadim <roberto at spadim dot com dot br>
+ *              Vinicius Souza <vdssgmu at gmail dot com>
+ *
+ *
+ * NOTA: De acordo com a ISO o formato OficioII não existe mais e portanto só devemos
+ *       usar o padrão A4.
+ *
+ */
 
-namespace Extras;
+//namespace NFePHP;
 
-use Extras\nfephpException;
-use Extras\PdfNFePHP;
-use Extras\CommonNFePHP;
-use Extras\DocumentoNFePHP;
-use Extras\DomDocumentNFePHP;
-
+//define o caminho base da instalação do sistema
+if (!defined('PATH_ROOT')) {
+    define('PATH_ROOT', dirname(dirname(dirname(__FILE__))).DIRECTORY_SEPARATOR);
+}
 //ajuste do tempo limite de resposta do processo
-//set_time_limit(1800);
+set_time_limit(1800);
 //definição do caminho para o diretorio com as fontes do FDPF
 if (!defined('FPDF_FONTPATH')) {
     define('FPDF_FONTPATH', 'font/');
@@ -21,7 +74,17 @@ if (!defined('NFEPHP_SITUACAO_EXTERNA_CANCELADA')) {
     define('NFEPHP_SITUACAO_EXTERNA_DPEC', 3);
     define('NFEPHP_SITUACAO_EXTERNA_NONE', 0);
 }
-
+//classe das Excecoes
+require_once PATH_ROOT.'libs/Common/ExceptionNFePHP.class.php';
+//classe extendida da classe FPDF para montagem do arquivo pdf
+require_once PATH_ROOT.'libs/Common/PdfNFePHP.class.php';
+//classe com as funções communs entre DANFE e DACTE
+require_once PATH_ROOT.'libs/Common/CommonNFePHP.class.php';
+//interface
+require_once PATH_ROOT.'libs/Common/DocumentoNFePHP.interface.php';
+//classe com as funções DOM
+require_once PATH_ROOT.'libs/Common/DomDocumentNFePHP.class.php';
+//classe principal
 class DanfeNFePHP extends CommonNFePHP implements DocumentoNFePHP
 {
 
@@ -2190,7 +2253,7 @@ class DanfeNFePHP extends CommonNFePHP implements DocumentoNFePHP
         $texto = 'QUANTIDADE';
         $aFont = array('font'=>$this->fontePadrao, 'size'=>6, 'style'=>'');
         $this->pTextBox($x, $y, $w1, $h, $texto, $aFont, 'T', 'L', 1, '');
-        if(!empty($quantidade)){
+        if (!empty($quantidade)) {
             $texto = $quantidade;
             $aFont = array('font'=>$this->fontePadrao, 'size'=>10, 'style'=>'B');
             $this->pTextBox($x, $y, $w1, $h, $texto, $aFont, 'B', 'C', 0, '');
@@ -2320,8 +2383,8 @@ class DanfeNFePHP extends CommonNFePHP implements DocumentoNFePHP
             $texto = str_replace(";", "\n", $texto);
         }
         return $texto;
-    }
-    
+    } //fim descricaoProduto
+
     /**
      * itensDANFE
      * Monta o campo de itens da DANFE (retrato e paisagem)
@@ -2598,7 +2661,7 @@ class DanfeNFePHP extends CommonNFePHP implements DocumentoNFePHP
             }
         }
         return $oldY+$hmax;
-    }
+    } // fim itensDANFE
 
     /**
      * issqnDANFE
@@ -2677,7 +2740,7 @@ class DanfeNFePHP extends CommonNFePHP implements DocumentoNFePHP
         $aFont = array('font'=>$this->fontePadrao, 'size'=>10, 'style'=>'B');
         $this->pTextBox($x, $y, $w, $h, $texto, $aFont, 'B', 'R', 0, '');
         return ($y+$h+1);
-    }
+    } //fim issqnDANFE
 
     /**
      *dadosAdicionaisDANFE
@@ -2760,7 +2823,7 @@ class DanfeNFePHP extends CommonNFePHP implements DocumentoNFePHP
         $aFont = array('font'=>$this->fontePadrao, 'size'=>7, 'style'=>'');
         $this->pTextBox($x, $y, $w-2, $h-3, $texto, $aFont, 'T', 'L', 0, '', false);
         return $y+$h;
-    }
+    } //fim dadosAdicionaisDANFE
 
     /**
      * pRodape
@@ -2784,7 +2847,7 @@ class DanfeNFePHP extends CommonNFePHP implements DocumentoNFePHP
         $this->pTextBox($x, $y, $w, 0, $texto, $aFont, 'T', 'L', false);
         $texto = "DanfeNFePHP ver. " . $this->version .  "  Powered by NFePHP (GNU/GPLv3 GNU/LGPLv3) © www.nfephp.org";
         $this->pTextBox($x, $y, $w, 0, $texto, $aFont, 'T', 'R', false, 'http://www.nfephp.org');
-    }
+    } //fim pRodape
 
     /**
      * pCcanhotoDANFE
@@ -2930,7 +2993,7 @@ class DanfeNFePHP extends CommonNFePHP implements DocumentoNFePHP
             $this->pdf->DashedVLine(23, $oldY, 0.1, $this->wPrint-20, 67);
             return $x;
         }
-    }
+    } //fim pCanhotoDANFE
 
     /**
      * pGeraInformacoesDaTagCompra
@@ -2955,7 +3018,7 @@ class DanfeNFePHP extends CommonNFePHP implements DocumentoNFePHP
             }
         }
         return $saida;
-    }
+    } // fim geraInformacoesDaTagCompra
 
     /**
      * pGeraChaveAdicionalDeContingencia
@@ -2994,7 +3057,7 @@ class DanfeNFePHP extends CommonNFePHP implements DocumentoNFePHP
         $chave = sprintf($forma, $cUF, $this->tpEmis, $CNPJ, $vNF, $vICMS, $icmss, $dd);
         $chave = $chave . $this->pModulo11($chave);
         return $chave;
-    }
+    } //fim geraChaveAdicionalDeContingencia
 
     /**
      * pGeraInformacoesDasNotasReferenciadas
@@ -3080,5 +3143,5 @@ class DanfeNFePHP extends CommonNFePHP implements DocumentoNFePHP
             }
         }
         return $saida;
-    }
+    } // fim geraInformacoesDasNotasReferenciadas
 }
